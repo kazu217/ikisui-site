@@ -29,6 +29,7 @@ const SITE_NAME = "俺がAmazon PA-APIへのアクセス件取得の条件をク
 const MAIN_AFFILIATE_URL =
   "https://www.amazon.co.jp?&linkCode=ll2&tag=rikougakubu03-22&linkId=674437ff17d1d998509ceba5b979b141&ref_=as_li_ss_tl";
 const SHORT_AFFILIATE_URL = "https://amzn.to/49JXWps";
+const IS_ADMIN_ENABLED = import.meta.env.DEV;
 
 const seedProducts: AffiliateProduct[] = [
   {
@@ -66,7 +67,7 @@ const seedProducts: AffiliateProduct[] = [
     asin: "B0SAMPLE03",
     title: "PC・ガジェットおすすめ枠",
     category: "ガジェット",
-    description: "管理画面からAmazon URLを入力すると、この一覧に新しい商品カードが追加されます。",
+    description: "ガジェットやPC周辺機器の候補をまとめています。価格と在庫はAmazonで確認してください。",
     imageUrl:
       "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80",
     affiliateUrl: "https://www.amazon.co.jp/dp/B0SAMPLE03?tag=example-22",
@@ -201,28 +202,30 @@ function App() {
             <span>Amazon PA-APIアクセス権取得チャレンジ</span>
           </div>
         </div>
-        <nav className="view-switch" aria-label="表示切替">
-          <button
-            className={view === "site" ? "switch-button active" : "switch-button"}
-            onClick={() => setView("site")}
-            type="button"
-          >
-            <LayoutGrid size={18} />
-            サイト
-          </button>
-          <button
-            className={view === "admin" ? "switch-button active" : "switch-button"}
-            onClick={() => setView("admin")}
-            type="button"
-          >
-            <PackagePlus size={18} />
-            商品追加
-          </button>
-        </nav>
+        {IS_ADMIN_ENABLED && (
+          <nav className="view-switch" aria-label="表示切替">
+            <button
+              className={view === "site" ? "switch-button active" : "switch-button"}
+              onClick={() => setView("site")}
+              type="button"
+            >
+              <LayoutGrid size={18} />
+              サイト
+            </button>
+            <button
+              className={view === "admin" ? "switch-button active" : "switch-button"}
+              onClick={() => setView("admin")}
+              type="button"
+            >
+              <PackagePlus size={18} />
+              商品追加
+            </button>
+          </nav>
+        )}
       </header>
 
       <main>
-        {view === "site" ? (
+        {view === "site" || !IS_ADMIN_ENABLED ? (
           <PublicSite
             categories={categories}
             products={visibleProducts}
@@ -364,7 +367,7 @@ function PublicSite(props: {
         <div className="empty-state">
           <Search size={24} />
           <strong>表示できる商品がありません</strong>
-          <span>検索条件を変えるか、商品追加画面から商品を登録してください。</span>
+          <span>検索条件を変えてもう一度確認してください。</span>
         </div>
       )}
     </section>

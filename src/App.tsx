@@ -25,7 +25,7 @@ import {
 type View = "site" | "admin";
 
 const STORAGE_KEY = "amazon3.affiliateProducts.v1";
-const SITE_NAME = "俺がAmazon PA-APIへのアクセス件取得の条件をクリアするためのサイト";
+const SITE_NAME = "買い物応援リンク集";
 const MAIN_AFFILIATE_URL =
   "https://www.amazon.co.jp?&linkCode=ll2&tag=rikougakubu03-22&linkId=674437ff17d1d998509ceba5b979b141&ref_=as_li_ss_tl";
 const SHORT_AFFILIATE_URL = "https://amzn.to/49JXWps";
@@ -280,11 +280,11 @@ function PublicSite(props: {
     <section className="public-layout">
       <div className="section-heading">
         <div>
-          <p className="eyebrow">Amazon PA-API Access Challenge</p>
+          <p className="eyebrow">Shopping Support Links</p>
           <h1>{SITE_NAME}</h1>
         </div>
         <p className="disclosure">
-          Amazon PA-APIへのアクセス権を取得するためには、過去30日間に条件を満たす売り上げを10件有する必要があります。よければ下のAmazonリンクから買い物して協力してもらえると助かります。Amazonのアソシエイトとして、当サイトは適格販売により収入を得ています。
+          Amazon PA APIへのアクセス権を取得するためには、過去30日間に条件を満たす売り上げを10件有する必要があります。よければ下のAmazonリンクから買い物して協力してもらえると助かります。Amazonのアソシエイトとして、当サイトは適格販売により収入を得ています。
         </p>
       </div>
 

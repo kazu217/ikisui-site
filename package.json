@@ -1,13 +1,15 @@
 {
-  "name": "ikisui-site",
+  "name": "kissui-site",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
-    "dev:worker": "npm run build && wrangler dev",
+    "dev:worker": "npm run build && wrangler dev --config wrangler.worker.toml",
+    "dev:pages": "npm run build && wrangler pages dev dist --compatibility-date=2026-05-12 --kv=PRODUCTS_KV --binding ADMIN_PASSWORD=$ADMIN_PASSWORD --binding SESSION_SECRET=$SESSION_SECRET",
     "build": "tsc -b && vite build",
-    "deploy": "npm run build && wrangler deploy",
+    "deploy": "npm run build && wrangler pages deploy dist --project-name kissui-site --branch main",
+    "deploy:worker": "npm run build && wrangler deploy --config wrangler.worker.toml",
     "preview": "vite preview --host 127.0.0.1",
     "test": "vitest run --config vitest.config.ts",
     "test:watch": "vitest --config vitest.config.ts",

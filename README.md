@@ -1,7 +1,7 @@
 # 生粋サイト
 
 Amazonアフィリエイト用の商品サイトと、商品を追加するためのローカル管理アプリです。
-現在はCloudflare Workers + KVの無料枠で、公開サイト上の管理画面から商品を保存できます。
+現在はCloudflare Pages Functions + KVの無料枠で、公開サイト上の管理画面から商品を保存できます。
 
 ## What It Does
 
@@ -36,10 +36,10 @@ npm run deploy
 
 Public app URL:
 
-- https://ikisui-site.kazu-translate.workers.dev/
+- https://kissui-site.pages.dev/
 
 ## Production Notes
 
-- `ADMIN_PASSWORD` and `SESSION_SECRET` are Cloudflare Worker secrets.
+- `ADMIN_PASSWORD` and `SESSION_SECRET` are Cloudflare Pages secrets.
 - `.env` is local-only and must not be committed.
 - Cloudflare KV namespace `PRODUCTS_KV` stores the product list.

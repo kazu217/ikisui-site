@@ -1,12 +1,6 @@
-name = "ikisui-site"
-main = "src/worker.ts"
+name = "kissui-site"
 compatibility_date = "2026-05-12"
-workers_dev = true
-
-[assets]
-directory = "./dist"
-binding = "ASSETS"
-not_found_handling = "single-page-application"
+pages_build_output_dir = "./dist"
 
 [[kv_namespaces]]
 binding = "PRODUCTS_KV"

@@ -35,7 +35,7 @@ Build a local MVP with two connected surfaces:
 
 Product additions now update the deployed site through a server-backed store:
 
-- Cloudflare Workers API.
+- Cloudflare Pages Functions API.
 - Cloudflare KV namespace for products.
 - Admin authentication through Worker secrets and an HttpOnly session cookie.
 - Official Amazon API integration for product titles/images if access is approved.

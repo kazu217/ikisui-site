@@ -192,6 +192,40 @@ h2 {
   color: #23485d;
 }
 
+.admin-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-notice span {
+  min-width: 0;
+}
+
+.admin-login {
+  display: grid;
+  min-height: calc(100vh - 140px);
+  place-items: center;
+}
+
+.admin-login .panel {
+  width: min(100%, 440px);
+}
+
+.admin-login h1 {
+  font-size: 22px;
+}
+
+.error-message {
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #8a2d24;
+  background: #ffe4df;
+  font-size: 13px;
+  font-weight: 800;
+}
+
 .main-affiliate-box {
   display: grid;
   justify-items: center;
@@ -629,8 +663,13 @@ textarea:focus {
   .view-switch,
   .product-grid,
   .two-fields,
-  .json-actions {
+  .json-actions,
+  .admin-notice {
     grid-template-columns: 1fr;
+  }
+
+  .admin-notice {
+    display: grid;
   }
 
   .switch-button {

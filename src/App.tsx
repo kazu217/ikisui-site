@@ -30,6 +30,8 @@ const MAIN_AFFILIATE_URL =
   "https://www.amazon.co.jp?&linkCode=ll2&tag=rikougakubu03-22&linkId=674437ff17d1d998509ceba5b979b141&ref_=as_li_ss_tl";
 const SHORT_AFFILIATE_URL = "https://amzn.to/49JXWps";
 const IS_ADMIN_ENABLED = import.meta.env.DEV;
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD ?? "";
+const ADMIN_SESSION_KEY = "ikisui.adminSession.v1";
 
 const seedProducts: AffiliateProduct[] = [
   {
@@ -103,6 +105,13 @@ function App() {
   const [selectedCategory, setSelectedCategory] = useState("すべて");
   const [notice, setNotice] = useState("Amazon URLを入れると、ASINとtagを読み取って商品カードを追加できます。");
   const [importText, setImportText] = useState("");
+  const [adminPasswordInput, setAdminPasswordInput] = useState("");
+  const [adminLoginError, setAdminLoginError] = useState("");
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(
+    () =>
+      IS_ADMIN_ENABLED &&
+      window.sessionStorage.getItem(ADMIN_SESSION_KEY) === "authenticated"
+  );
 
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
@@ -192,6 +201,29 @@ function App() {
     }
   }
 
+  function loginAdmin() {
+    if (!ADMIN_PASSWORD) {
+      setAdminLoginError("管理パスワードが.envに設定されていません。");
+      return;
+    }
+
+    if (adminPasswordInput === ADMIN_PASSWORD) {
+      window.sessionStorage.setItem(ADMIN_SESSION_KEY, "authenticated");
+      setIsAdminAuthenticated(true);
+      setAdminPasswordInput("");
+      setAdminLoginError("");
+      return;
+    }
+
+    setAdminLoginError("パスワードが違います。");
+  }
+
+  function logoutAdmin() {
+    window.sessionStorage.removeItem(ADMIN_SESSION_KEY);
+    setIsAdminAuthenticated(false);
+    setView("site");
+  }
+
   return (
     <div className="app-shell">
       <header className="site-header">
@@ -234,7 +266,7 @@ function App() {
             onQueryChange={setQuery}
             onCategoryChange={setSelectedCategory}
           />
-        ) : (
+        ) : isAdminAuthenticated ? (
           <AdminApp
             badge={badge}
             category={category}
@@ -257,10 +289,18 @@ function App() {
             onImageUrlChange={setImageUrl}
             onImportProducts={importProducts}
             onImportTextChange={setImportText}
+            onLogout={logoutAdmin}
             onRemoveProduct={removeProduct}
             onSourceUrlChange={setSourceUrl}
             onTitleChange={setTitle}
             onTrackingIdChange={setTrackingId}
+          />
+        ) : (
+          <AdminLogin
+            error={adminLoginError}
+            password={adminPasswordInput}
+            onPasswordChange={setAdminPasswordInput}
+            onSubmit={loginAdmin}
           />
         )}
       </main>
@@ -374,6 +414,46 @@ function PublicSite(props: {
   );
 }
 
+function AdminLogin(props: {
+  error: string;
+  password: string;
+  onPasswordChange: (value: string) => void;
+  onSubmit: () => void;
+}) {
+  return (
+    <section className="admin-login">
+      <form
+        className="panel stack"
+        onSubmit={(event) => {
+          event.preventDefault();
+          props.onSubmit();
+        }}
+      >
+        <div className="panel-title">
+          <ShieldCheck size={19} />
+          <h1>管理画面ログイン</h1>
+        </div>
+        <label>
+          パスワード
+          <input
+            autoComplete="current-password"
+            autoFocus
+            value={props.password}
+            onChange={(event) => props.onPasswordChange(event.target.value)}
+            placeholder="管理パスワード"
+            type="password"
+          />
+        </label>
+        {props.error && <div className="error-message">{props.error}</div>}
+        <button className="primary" type="submit">
+          <ShieldCheck size={18} />
+          ログイン
+        </button>
+      </form>
+    </section>
+  );
+}
+
 function AdminApp(props: {
   badge: string;
   category: string;
@@ -396,6 +476,7 @@ function AdminApp(props: {
   onImageUrlChange: (value: string) => void;
   onImportProducts: () => void;
   onImportTextChange: (value: string) => void;
+  onLogout: () => void;
   onRemoveProduct: (asin: string) => void;
   onSourceUrlChange: (value: string) => void;
   onTitleChange: (value: string) => void;
@@ -408,7 +489,12 @@ function AdminApp(props: {
           <p className="eyebrow">Admin App</p>
           <h1>Amazon URLから商品カードを追加</h1>
         </div>
-        <div className="notice">{props.notice}</div>
+        <div className="notice admin-notice">
+          <span>{props.notice}</span>
+          <button className="ghost" onClick={props.onLogout} type="button">
+            ログアウト
+          </button>
+        </div>
       </div>
 
       <div className="admin-grid">

@@ -14,7 +14,7 @@
 - Public site shows product cards with images, category, ASIN, disclosure, and direct Amazon links.
 - Admin screen accepts Amazon.co.jp URLs with affiliate tags.
 - Admin screen adds a product to the public list without page reload.
-- Products remain after refresh through localStorage.
+- Products remain after refresh through Cloudflare KV.
 - JSON export/import works.
 - No UI claims live price, stock, discount, or urgency.
 

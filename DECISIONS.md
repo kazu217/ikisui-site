@@ -10,9 +10,9 @@ The first version is a static-style React app with a public product list and an 
 
 The app extracts ASINs from user-provided Amazon.co.jp URLs but does not fetch Amazon pages or product details.
 
-### 2026-05-12: Store Products Locally First
+### 2026-05-12: Store Products In Cloudflare KV
 
-Products are saved in browser localStorage for fast local validation. Production needs a server-side store.
+Products are saved in Cloudflare KV through a Worker API so admin changes automatically update the public site.
 
 ### 2026-05-12: Keep Affiliate Links Direct
 

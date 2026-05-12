@@ -1,16 +1,17 @@
 # 生粋サイト
 
 Amazonアフィリエイト用の商品サイトと、商品を追加するためのローカル管理アプリです。
+現在はCloudflare Workers + KVの無料枠で、公開サイト上の管理画面から商品を保存できます。
 
 ## What It Does
 
 - 公開用の商品一覧サイトを表示します。
 - トップ中央にAmazonへの大きいアフィリエイトリンクを表示します。
-- 管理画面でAmazon.co.jpの商品URLまたはASINを入力できます。
+- 目立たない「管理」リンクからログインして、Amazon.co.jpの商品URLまたはASINを入力できます。
 - URL内の `tag` があればそのtracking IDを使います。
 - URL内に `tag` がない場合は、管理画面のデフォルトtracking IDで直接アフィリエイトリンクを生成します。
 - 商品名、カテゴリ、画像URL、紹介文、バッジは手入力します。
-- 商品データはMVPとしてブラウザのlocalStorageに保存します。
+- 商品データはCloudflare KVに保存され、公開版へ自動反映されます。
 - JSON出力/読込で商品データをバックアップできます。
 
 ## Compliance Notes
@@ -25,16 +26,20 @@ Amazonアフィリエイト用の商品サイトと、商品を追加するた�
 ```bash
 npm install
 npm run dev
+npm run dev:worker
 npm test
 npm run lint
 npm run typecheck
 npm run build
+npm run deploy
 ```
 
-Local app URL:
+Public app URL:
 
-- http://127.0.0.1:5173/
+- https://ikisui-site.kazu-translate.workers.dev/
 
-## Next Production Step
+## Production Notes
 
-公開サイトへ全訪問者共通で商品を反映するには、localStorageをCloudflare Workers + D1などのサーバー保存に置き換え、管理画面に認証を追加してください。
+- `ADMIN_PASSWORD` and `SESSION_SECRET` are Cloudflare Worker secrets.
+- `.env` is local-only and must not be committed.
+- Cloudflare KV namespace `PRODUCTS_KV` stores the product list.

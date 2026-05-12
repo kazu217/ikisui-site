@@ -614,6 +614,30 @@ textarea:focus {
   display: block;
 }
 
+.site-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 30px;
+  color: #7d878f;
+  font-size: 12px;
+}
+
+.admin-entry {
+  border: 0;
+  padding: 0;
+  color: #98a1a8;
+  background: transparent;
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.admin-entry:hover {
+  color: #5c666d;
+}
+
 @media (max-width: 980px) {
   .site-header,
   .section-heading,

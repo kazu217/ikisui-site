@@ -11,7 +11,7 @@ Build a local MVP with two connected surfaces:
 
 - Extract ASINs from Amazon.co.jp URLs.
 - Preserve or generate direct Amazon Associates links with a tracking ID.
-- Store products locally in the browser for the MVP.
+- Store products in Cloudflare KV through a Worker API.
 - Let the admin enter title, category, image URL, short description, and badges manually.
 - Show an affiliate disclosure on the public site.
 
@@ -33,9 +33,9 @@ Build a local MVP with two connected surfaces:
 
 ## Future Backend Path
 
-To make additions update a deployed public site for all visitors, replace localStorage with a server-backed store:
+Product additions now update the deployed site through a server-backed store:
 
 - Cloudflare Workers API.
-- Cloudflare D1 table for products.
-- Admin authentication before public deployment.
+- Cloudflare KV namespace for products.
+- Admin authentication through Worker secrets and an HttpOnly session cookie.
 - Official Amazon API integration for product titles/images if access is approved.

@@ -10,4 +10,4 @@ not_found_handling = "single-page-application"
 
 [[kv_namespaces]]
 binding = "PRODUCTS_KV"
-id = "replace-with-cloudflare-kv-id"
+id = "6d7411f32c1a47de84ead0b36b98650f"

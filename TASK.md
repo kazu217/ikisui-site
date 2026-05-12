@@ -10,17 +10,19 @@ Implementation backlog for the Amazon affiliate site MVP.
 - [x] Build an admin product-add screen.
 - [x] Extract ASINs from Amazon.co.jp product URLs.
 - [x] Preserve URL tracking tags or generate direct Amazon Associates links.
-- [x] Persist products in browser localStorage.
+- [x] Persist products in Cloudflare KV.
 - [x] Add JSON export/import for product backups.
 - [x] Add affiliate disclosure to the public site.
 - [x] Add tests for product URL parsing and product creation.
+- [x] Add public admin login backed by Worker secrets.
+- [x] Add automatic public-site reflection after admin saves products.
 
 ## Next
 
 - [ ] Confirm the real Amazon Associates tracking ID.
 - [ ] Decide the production hosting target.
-- [ ] Replace localStorage with a backend store for deployed shared data.
-- [ ] Add admin authentication before public deployment.
+- [x] Replace localStorage with a backend store for deployed shared data.
+- [x] Add admin authentication before public deployment.
 - [ ] Add official Amazon API integration if approved access is available.
 - [ ] Create a production product JSON seed or D1 migration.
 

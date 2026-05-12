@@ -21,78 +21,20 @@ import {
   parseAmazonProductInput,
   upsertAffiliateProduct
 } from "./domain/products";
+import { seedProducts } from "./data/seedProducts";
 
 type View = "site" | "admin";
 
-const STORAGE_KEY = "amazon3.affiliateProducts.v1";
 const SITE_NAME = "生粋サイト";
 const MAIN_AFFILIATE_URL =
   "https://www.amazon.co.jp?&linkCode=ll2&tag=rikougakubu03-22&linkId=674437ff17d1d998509ceba5b979b141&ref_=as_li_ss_tl";
 const SHORT_AFFILIATE_URL = "https://amzn.to/49JXWps";
-const IS_ADMIN_ENABLED = import.meta.env.DEV;
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD ?? "";
-const ADMIN_SESSION_KEY = "ikisui.adminSession.v1";
-
-const seedProducts: AffiliateProduct[] = [
-  {
-    id: "product-B0SAMPLE01",
-    asin: "B0SAMPLE01",
-    title: "Nintendo Switch 関連アクセサリー",
-    category: "ゲーム",
-    description: "入荷や価格の断定をせず、Amazonの商品ページで購入条件を確認してもらうための掲載例です。",
-    imageUrl:
-      "https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?auto=format&fit=crop&w=900&q=80",
-    affiliateUrl: "https://www.amazon.co.jp/dp/B0SAMPLE01?tag=example-22",
-    sourceUrl: "https://www.amazon.co.jp/dp/B0SAMPLE01?tag=example-22",
-    badge: "注目",
-    featured: true,
-    createdAt: new Date("2026-05-12T10:00:00+09:00").toISOString(),
-    updatedAt: new Date("2026-05-12T10:00:00+09:00").toISOString()
-  },
-  {
-    id: "product-B0SAMPLE02",
-    asin: "B0SAMPLE02",
-    title: "PlayStation 周辺機器セレクション",
-    category: "ゲーム",
-    description: "手入力の商品紹介文だけを表示します。価格・在庫・配送条件はリンク先のAmazonが正です。",
-    imageUrl:
-      "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?auto=format&fit=crop&w=900&q=80",
-    affiliateUrl: "https://www.amazon.co.jp/dp/B0SAMPLE02?tag=example-22",
-    sourceUrl: "https://www.amazon.co.jp/dp/B0SAMPLE02?tag=example-22",
-    badge: "定番",
-    featured: false,
-    createdAt: new Date("2026-05-12T10:05:00+09:00").toISOString(),
-    updatedAt: new Date("2026-05-12T10:05:00+09:00").toISOString()
-  },
-  {
-    id: "product-B0SAMPLE03",
-    asin: "B0SAMPLE03",
-    title: "PC・ガジェットおすすめ枠",
-    category: "ガジェット",
-    description: "ガジェットやPC周辺機器の候補をまとめています。価格と在庫はAmazonで確認してください。",
-    imageUrl:
-      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80",
-    affiliateUrl: "https://www.amazon.co.jp/dp/B0SAMPLE03?tag=example-22",
-    sourceUrl: "https://www.amazon.co.jp/dp/B0SAMPLE03?tag=example-22",
-    badge: "比較候補",
-    featured: false,
-    createdAt: new Date("2026-05-12T10:10:00+09:00").toISOString(),
-    updatedAt: new Date("2026-05-12T10:10:00+09:00").toISOString()
-  }
-];
-
-function readStoredProducts(): AffiliateProduct[] {
-  try {
-    const value = window.localStorage.getItem(STORAGE_KEY);
-    return value ? (JSON.parse(value) as AffiliateProduct[]) : seedProducts;
-  } catch {
-    return seedProducts;
-  }
-}
 
 function App() {
   const [view, setView] = useState<View>("site");
-  const [products, setProducts] = useState<AffiliateProduct[]>(readStoredProducts);
+  const [products, setProducts] = useState<AffiliateProduct[]>(seedProducts);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+  const [publicNotice, setPublicNotice] = useState("");
   const [trackingId, setTrackingId] = useState("rikougakubu03-22");
   const [sourceUrl, setSourceUrl] = useState("");
   const [title, setTitle] = useState("");
@@ -107,15 +49,12 @@ function App() {
   const [importText, setImportText] = useState("");
   const [adminPasswordInput, setAdminPasswordInput] = useState("");
   const [adminLoginError, setAdminLoginError] = useState("");
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(
-    () =>
-      IS_ADMIN_ENABLED &&
-      window.sessionStorage.getItem(ADMIN_SESSION_KEY) === "authenticated"
-  );
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
 
   useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
-  }, [products]);
+    void loadProducts();
+    void refreshAdminSession();
+  }, []);
 
   const parsedInput = useMemo(() => parseAmazonProductInput(sourceUrl), [sourceUrl]);
   const categories = useMemo(
@@ -149,7 +88,49 @@ function App() {
     setFeatured(false);
   }
 
-  function addProduct() {
+  async function loadProducts() {
+    setIsLoadingProducts(true);
+    try {
+      const response = await fetch("/api/products");
+      if (!response.ok) {
+        throw new Error("products request failed");
+      }
+      const data = (await response.json()) as { products?: AffiliateProduct[] };
+      setProducts(Array.isArray(data.products) ? data.products : seedProducts);
+      setPublicNotice("");
+    } catch {
+      setProducts(seedProducts);
+      setPublicNotice("商品データの取得に失敗したため、初期データを表示しています。");
+    } finally {
+      setIsLoadingProducts(false);
+    }
+  }
+
+  async function saveProducts(nextProducts: AffiliateProduct[], successMessage: string) {
+    const response = await fetch("/api/admin/products", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ products: nextProducts })
+    });
+
+    if (response.status === 401) {
+      setIsAdminAuthenticated(false);
+      setNotice("ログインし直してください。");
+      return false;
+    }
+
+    if (!response.ok) {
+      setNotice("保存に失敗しました。少し待ってからもう一度試してください。");
+      return false;
+    }
+
+    const data = (await response.json()) as { products?: AffiliateProduct[] };
+    setProducts(Array.isArray(data.products) ? data.products : nextProducts);
+    setNotice(successMessage);
+    return true;
+  }
+
+  async function addProduct() {
     try {
       const product = createAffiliateProduct({
         sourceUrl,
@@ -161,19 +142,26 @@ function App() {
         badge,
         featured
       });
+      const nextProducts = upsertAffiliateProduct(products, product);
+      const didSave = await saveProducts(
+        nextProducts,
+        `${product.title} を公開サイトに追加しました。`
+      );
 
-      setProducts((current) => upsertAffiliateProduct(current, product));
-      setNotice(`${product.title} をサイトに追加しました。`);
-      resetForm();
-      setView("site");
+      if (didSave) {
+        resetForm();
+        setView("site");
+      }
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "商品の追加に失敗しました。");
     }
   }
 
-  function removeProduct(asin: string) {
-    setProducts((current) => current.filter((product) => product.asin !== asin));
-    setNotice(`${asin} を削除しました。`);
+  async function removeProduct(asin: string) {
+    await saveProducts(
+      products.filter((product) => product.asin !== asin),
+      `${asin} を公開サイトから削除しました。`
+    );
   }
 
   async function copyExportJson() {
@@ -188,27 +176,36 @@ function App() {
     }
   }
 
-  function importProducts() {
+  async function importProducts() {
     try {
       const parsed = JSON.parse(importText) as AffiliateProduct[];
       if (!Array.isArray(parsed)) {
         throw new Error("JSON配列ではありません");
       }
-      setProducts(parsed);
-      setNotice(`${parsed.length}件の商品JSONを読み込みました。`);
+      await saveProducts(parsed, `${parsed.length}件の商品JSONを公開サイトへ保存しました。`);
     } catch {
       setNotice("商品JSONの形式を確認してください。");
     }
   }
 
-  function loginAdmin() {
-    if (!ADMIN_PASSWORD) {
-      setAdminLoginError("管理パスワードが.envに設定されていません。");
-      return;
+  async function refreshAdminSession() {
+    try {
+      const response = await fetch("/api/admin/session");
+      const data = (await response.json()) as { authenticated?: boolean };
+      setIsAdminAuthenticated(Boolean(data.authenticated));
+    } catch {
+      setIsAdminAuthenticated(false);
     }
+  }
 
-    if (adminPasswordInput === ADMIN_PASSWORD) {
-      window.sessionStorage.setItem(ADMIN_SESSION_KEY, "authenticated");
+  async function loginAdmin() {
+    const response = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ password: adminPasswordInput })
+    });
+
+    if (response.ok) {
       setIsAdminAuthenticated(true);
       setAdminPasswordInput("");
       setAdminLoginError("");
@@ -218,8 +215,8 @@ function App() {
     setAdminLoginError("パスワードが違います。");
   }
 
-  function logoutAdmin() {
-    window.sessionStorage.removeItem(ADMIN_SESSION_KEY);
+  async function logoutAdmin() {
+    await fetch("/api/admin/logout", { method: "POST" }).catch(() => undefined);
     setIsAdminAuthenticated(false);
     setView("site");
   }
@@ -234,7 +231,7 @@ function App() {
             <span>Amazon PA-APIアクセス権取得チャレンジ</span>
           </div>
         </div>
-        {IS_ADMIN_ENABLED && (
+        {isAdminAuthenticated && (
           <nav className="view-switch" aria-label="表示切替">
             <button
               className={view === "site" ? "switch-button active" : "switch-button"}
@@ -257,14 +254,17 @@ function App() {
       </header>
 
       <main>
-        {view === "site" || !IS_ADMIN_ENABLED ? (
+        {view === "site" ? (
           <PublicSite
             categories={categories}
+            isLoading={isLoadingProducts}
+            notice={publicNotice}
             products={visibleProducts}
             query={query}
             selectedCategory={selectedCategory}
             onQueryChange={setQuery}
             onCategoryChange={setSelectedCategory}
+            onOpenAdmin={() => setView("admin")}
           />
         ) : isAdminAuthenticated ? (
           <AdminApp
@@ -310,11 +310,14 @@ function App() {
 
 function PublicSite(props: {
   categories: string[];
+  isLoading: boolean;
+  notice: string;
   products: AffiliateProduct[];
   query: string;
   selectedCategory: string;
   onQueryChange: (value: string) => void;
   onCategoryChange: (value: string) => void;
+  onOpenAdmin: () => void;
 }) {
   return (
     <section className="public-layout">
@@ -350,6 +353,8 @@ function PublicSite(props: {
         </a>
         <p>個々の商品リンクはこの下に並べています。価格・在庫・配送条件はAmazon.co.jp側で確認してください。</p>
       </section>
+
+      {props.notice && <div className="notice">{props.notice}</div>}
 
       <div className="toolbar">
         <label className="search-field">
@@ -410,6 +415,13 @@ function PublicSite(props: {
           <span>検索条件を変えてもう一度確認してください。</span>
         </div>
       )}
+
+      <footer className="site-footer">
+        <span>{props.isLoading ? "商品データを読み込み中" : " "}</span>
+        <button className="admin-entry" onClick={props.onOpenAdmin} type="button">
+          管理
+        </button>
+      </footer>
     </section>
   );
 }
@@ -467,17 +479,17 @@ function AdminApp(props: {
   sourceUrl: string;
   title: string;
   trackingId: string;
-  onAddProduct: () => void;
+  onAddProduct: () => void | Promise<void>;
   onBadgeChange: (value: string) => void;
   onCategoryChange: (value: string) => void;
   onCopyExportJson: () => void;
   onDescriptionChange: (value: string) => void;
   onFeaturedChange: (value: boolean) => void;
   onImageUrlChange: (value: string) => void;
-  onImportProducts: () => void;
+  onImportProducts: () => void | Promise<void>;
   onImportTextChange: (value: string) => void;
-  onLogout: () => void;
-  onRemoveProduct: (asin: string) => void;
+  onLogout: () => void | Promise<void>;
+  onRemoveProduct: (asin: string) => void | Promise<void>;
   onSourceUrlChange: (value: string) => void;
   onTitleChange: (value: string) => void;
   onTrackingIdChange: (value: string) => void;

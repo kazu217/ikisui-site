@@ -11,7 +11,7 @@ Build an Amazon.co.jp affiliate product site and a small admin app that can add 
 - ASIN extraction from Amazon.co.jp URLs.
 - Direct Amazon Associates link generation.
 - Manual title, image URL, category, badge, and description entry.
-- Browser localStorage persistence for the local MVP.
+- Cloudflare KV persistence through a Worker API.
 - JSON export/import for backups.
 
 ## Compliance Guardrails
@@ -29,6 +29,6 @@ Agents working on this repo must not:
 ## Production Notes
 
 - Add admin authentication before deployment.
-- Move product storage from localStorage to a backend database for a shared public site.
+- Keep product storage in Cloudflare KV or migrate to D1 if relational queries become necessary.
 - Use official Amazon API access for product title/image automation if available.
 - Keep a visible Amazon Associates disclosure on the public site.

@@ -28,7 +28,6 @@ type View = "site" | "admin";
 const SITE_NAME = "生粋サイト";
 const MAIN_AFFILIATE_URL =
   "https://www.amazon.co.jp?&linkCode=ll2&tag=rikougakubu03-22&linkId=674437ff17d1d998509ceba5b979b141&ref_=as_li_ss_tl";
-const SHORT_AFFILIATE_URL = "https://amzn.to/49JXWps";
 
 function App() {
   const [view, setView] = useState<View>("site");
@@ -342,14 +341,6 @@ function PublicSite(props: {
         >
           Amazonで買い物して協力する
           <ArrowUpRight size={28} />
-        </a>
-        <a
-          className="short-link"
-          href={SHORT_AFFILIATE_URL}
-          rel="sponsored noopener noreferrer"
-          target="_blank"
-        >
-          短縮リンク: {SHORT_AFFILIATE_URL}
         </a>
         <p>個々の商品リンクはこの下に並べています。価格・在庫・配送条件はAmazon.co.jp側で確認してください。</p>
       </section>

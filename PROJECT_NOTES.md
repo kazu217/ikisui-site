@@ -1,10 +1,10 @@
-# 買い物応援リンク集 Notes
+# 生粋サイト Notes
 
 ## Goal
 
 Build a local MVP with two connected surfaces:
 
-- A public affiliate product site named `買い物応援リンク集`.
+- A public affiliate product site named `生粋サイト`.
 - An admin app that accepts an Amazon.co.jp URL with an affiliate tag and adds the product to the site.
 
 ## Current Safe Scope

@@ -1,10 +1,10 @@
-# 俺がAmazon PA-APIへのアクセス件取得の条件をクリアのためのサイト Notes
+# 俺がAmazon PA-APIへのアクセス件取得の条件をクリアするためのサイト Notes
 
 ## Goal
 
 Build a local MVP with two connected surfaces:
 
-- A public Amazon affiliate product site named `俺がAmazon PA-APIへのアクセス件取得の条件をクリアのためのサイト`.
+- A public Amazon affiliate product site named `俺がAmazon PA-APIへのアクセス件取得の条件をクリアするためのサイト`.
 - An admin app that accepts an Amazon.co.jp URL with an affiliate tag and adds the product to the site.
 
 ## Current Safe Scope

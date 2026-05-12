@@ -25,7 +25,7 @@ import {
 type View = "site" | "admin";
 
 const STORAGE_KEY = "amazon3.affiliateProducts.v1";
-const SITE_NAME = "俺がAmazon PA-APIへのアクセス件取得の条件をクリアのためのサイト";
+const SITE_NAME = "俺がAmazon PA-APIへのアクセス件取得の条件をクリアするためのサイト";
 const MAIN_AFFILIATE_URL =
   "https://www.amazon.co.jp?&linkCode=ll2&tag=rikougakubu03-22&linkId=674437ff17d1d998509ceba5b979b141&ref_=as_li_ss_tl";
 const SHORT_AFFILIATE_URL = "https://amzn.to/49JXWps";
